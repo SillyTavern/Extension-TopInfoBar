@@ -1,0 +1,60 @@
+body #sheld.flexPatch {
+    display: flex;
+    flex-direction: column;
+}
+
+body #sheld.flexPatch #chat {
+    flex-grow: 1;
+}
+
+#extensionTopBar {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+    align-content: center;
+    align-items: baseline;
+    width: 100%;
+    background-color: var(--SmartThemeBlurTintColor);
+    border: 1px solid var(--SmartThemeBorderColor);
+    border-radius: 10px 10px 0 0;
+    background-color: var(--SmartThemeBlurTintColor);
+    backdrop-filter: blur(var(--SmartThemeBlurStrength));
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    height: var(--bottomFormBlockSize);
+    padding: 0 10px;
+    gap: 10px;
+    font-size: calc(var(--mainFontSize) * 0.9);
+    margin-bottom: 1px;
+}
+
+#extensionTopBarChatName {
+    flex: 1;
+    cursor: default;
+    overflow-x: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 100%;
+    opacity: 0.8;
+}
+
+#extensionTopBarSearchInput {
+    background-color: transparent;
+    font-size: calc(var(--mainFontSize) * 0.9);
+    opacity: 0.8;
+    max-width: calc(var(--sheldWidth) * 0.25);
+    flex-grow: 1;
+}
+
+@media screen and (max-width: 1000px) {
+    #extensionTopBarSearchInput {
+        max-width: calc(var(--sheldWidth) * 0.5);
+    }
+}
+
+#extensionTopBarSearchInput:placeholder-shown {
+    font-style: italic;
+    opacity: 0.5;
+    border-color: transparent;
+}

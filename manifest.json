@@ -1,0 +1,12 @@
+{
+    "display_name": "Top Info Bar",
+    "loading_order": 1,
+    "requires": [],
+    "optional": [],
+    "js": "index.js",
+    "css": "style.css",
+    "author": "Cohee1207",
+    "version": "1.0.0",
+    "homePage": "https://github.com/SillyTavern/Extension-TopInfoBar",
+    "auto_update": true
+}
