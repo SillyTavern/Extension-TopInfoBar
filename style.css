@@ -26,7 +26,6 @@ body #sheld.flexPatch #chat {
     padding: 0 10px;
     gap: 10px;
     font-size: calc(var(--mainFontSize) * 0.9);
-    margin-bottom: 1px;
 }
 
 #extensionTopBarChatName {
