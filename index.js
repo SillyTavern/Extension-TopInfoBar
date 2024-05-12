@@ -77,14 +77,21 @@ const searchInput = document.createElement('input');
 const icons = [
     {
         id: 'extensionTopBarChatManager',
-        icon: 'fa-solid fa-address-book',
+        icon: 'fa-fw fa-solid fa-address-book',
         position: 'left',
         title: 'View chat files',
         onClick: onChatManagerClick,
     },
     {
+        id: 'extensionTopBarNewChat',
+        icon: 'fa-fw fa-solid fa-comments',
+        position: 'right',
+        title: 'New chat',
+        onClick: onNewChatClick,
+    },
+    {
         id: 'extensionTopBarCloseChat',
-        icon: 'fa-solid fa-times',
+        icon: 'fa-fw fa-solid fa-times',
         position: 'right',
         title: 'Close chat',
         onClick: onCloseChatClick,
@@ -97,6 +104,10 @@ function onChatManagerClick() {
 
 function onCloseChatClick() {
     document.getElementById('option_close_chat')?.click();
+}
+
+function onNewChatClick() {
+    document.getElementById('option_start_new_chat')?.click();
 }
 
 function patchSheldIfNeeded() {
@@ -175,6 +186,10 @@ function addIcons() {
         }
         if (icon.position === 'right') {
             topBar.appendChild(iconElement);
+            return;
+        }
+        if (icon.position === 'middle') {
+            topBar.insertBefore(iconElement, searchInput);
             return;
         }
     });
