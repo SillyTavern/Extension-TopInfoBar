@@ -1,4 +1,4 @@
-const { eventSource, event_types, getCurrentChatId } = SillyTavern.getContext();
+const { eventSource, event_types, getCurrentChatId, callGenericPopup, renameChat } = SillyTavern.getContext();
 import { debounce } from '../../../utils.js';
 
 // Source: https://github.com/bartaz/sandbox.js/blob/master/jquery.highlight.js
@@ -90,12 +90,19 @@ const icons = [
         onClick: onNewChatClick,
     },
     {
+        id: 'extensionTopBarRenameChat',
+        icon: 'fa-fw fa-solid fa-edit',
+        position: 'right',
+        title: 'Rename chat',
+        onClick: onRenameChatClick,
+    },
+    {
         id: 'extensionTopBarCloseChat',
         icon: 'fa-fw fa-solid fa-times',
         position: 'right',
         title: 'Close chat',
         onClick: onCloseChatClick,
-    }
+    },
 ];
 
 function onChatManagerClick() {
@@ -108,6 +115,22 @@ function onCloseChatClick() {
 
 function onNewChatClick() {
     document.getElementById('option_start_new_chat')?.click();
+}
+
+async function onRenameChatClick() {
+    const currentChatName = getCurrentChatId();
+
+    if (!currentChatName) {
+        return;
+    }
+
+    const newChatName = await callGenericPopup('Enter new chat name', 3, currentChatName);
+
+    if (!newChatName || newChatName === currentChatName) {
+        return;
+    }
+
+    await renameChat(currentChatName, newChatName);
 }
 
 function patchSheldIfNeeded() {
@@ -191,6 +214,9 @@ function addIcons() {
         if (icon.position === 'middle') {
             topBar.insertBefore(iconElement, searchInput);
             return;
+        }
+        if (id === 'extensionTopBarRenameChat' && typeof renameChat !== 'function') {
+            iconElement.classList.add('displayNone');
         }
     });
 }
