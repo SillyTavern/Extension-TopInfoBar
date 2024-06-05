@@ -206,7 +206,7 @@ function setChatName(name) {
                     selectedOption.insertAdjacentElement(position, option);
                 });
             }
-        }, 1);
+        }, 0);
     }
 }
 
