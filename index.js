@@ -1,4 +1,13 @@
-const { eventSource, event_types, getCurrentChatId, callGenericPopup, renameChat } = SillyTavern.getContext();
+const {
+    eventSource,
+    event_types,
+    getCurrentChatId,
+    callGenericPopup,
+    renameChat,
+    getRequestHeaders,
+    openGroupChat,
+    openCharacterChat,
+} = SillyTavern.getContext();
 import { debounce } from '../../../utils.js';
 
 // Source: https://github.com/bartaz/sandbox.js/blob/master/jquery.highlight.js
@@ -71,7 +80,7 @@ if (!jQuery.fn.highlight) {
 const sheld = document.getElementById('sheld');
 const chat = document.getElementById('chat');
 const topBar = document.createElement('div');
-const chatName = document.createElement('div');
+const chatName = document.createElement('select');
 const searchInput = document.createElement('input');
 
 const icons = [
@@ -150,13 +159,75 @@ function patchSheldIfNeeded() {
 
 function setChatName(name) {
     const isNotInChat = !name;
-    chatName.innerText = name || 'No chat selected';
+    chatName.innerHTML = '';
+    const selectedOption = document.createElement('option');
+    selectedOption.innerText = name || 'No chat selected';
+    selectedOption.selected = true;
+    chatName.appendChild(selectedOption);
+    chatName.disabled = true;
+
     icons.forEach(icon => {
         const iconElement = document.getElementById(icon.id);
         if (iconElement) {
             iconElement.classList.toggle('disabled', isNotInChat);
         }
     });
+
+    if (!isNotInChat && typeof openGroupChat === 'function' && typeof openCharacterChat === 'function') {
+        setTimeout(async () => {
+            const list = [];
+            const context = SillyTavern.getContext();
+            if (context.groupId) {
+                const group = context.groups.find(x => x.id == context.groupId);
+                if (group) {
+                    list.push(...group.chats);
+                }
+            }
+            else {
+                const characterAvatar = context.characters[context.characterId]?.avatar;
+                list.push(...await getListOfCharacterChats(characterAvatar));
+            }
+
+            if (list.length > 0) {
+                const selectedIndex = list.indexOf(name);
+                chatName.disabled = false;
+                list.sort((a, b) => a.localeCompare(b));
+                list.forEach((x, index) => {
+                    if (index === selectedIndex) {
+                        return;
+                    }
+
+                    const option = document.createElement('option');
+                    option.innerText = x;
+                    option.value = x;
+                    option.selected = x === name;
+
+                    const position = index < selectedIndex ? 'beforebegin' : 'afterend';
+                    selectedOption.insertAdjacentElement(position, option);
+                });
+            }
+        }, 1);
+    }
+}
+
+async function getListOfCharacterChats(avatar) {
+    try {
+        const result = await fetch('/api/characters/chats', {
+            method: 'POST',
+            headers: getRequestHeaders(),
+            body: JSON.stringify({ avatar_url: avatar, simple: true }),
+        });
+
+        if (!result.ok) {
+            return [];
+        }
+
+        const data = await result.json();
+        return data.map(x => String(x.file_name).replace('.jsonl', ''));
+    } catch (error) {
+        console.error('Failed to get list of character chats', error);
+        return [];
+    }
 }
 
 /**
@@ -225,4 +296,22 @@ patchSheldIfNeeded();
 addTopBar();
 addIcons();
 setChatName(getCurrentChatId());
+chatName.addEventListener('change', () => {
+    const context = SillyTavern.getContext();
+    const chatId = chatName.value;
+
+    if (!chatId) {
+        return;
+    }
+
+    if (typeof openGroupChat === 'function' && context.groupId) {
+        openGroupChat(context.groupId, chatId);
+        return;
+    }
+
+    if (typeof openCharacterChat === 'function' && context.characterId !== undefined) {
+        openCharacterChat(chatId);
+        return;
+    }
+});
 eventSource.on(event_types.CHAT_CHANGED, setChatName);

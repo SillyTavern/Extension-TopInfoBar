@@ -30,12 +30,14 @@ body #sheld.flexPatch #chat {
 
 #extensionTopBarChatName {
     flex: 1;
-    cursor: default;
+    cursor: pointer;
     overflow-x: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
     width: 100%;
     opacity: 0.8;
+    background: none;
+    border: none;
 }
 
 #extensionTopBarSearchInput {
