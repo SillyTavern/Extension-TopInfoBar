@@ -44,7 +44,7 @@ body #sheld.flexPatch #chat {
     background-color: transparent;
     font-size: calc(var(--mainFontSize) * 0.9);
     opacity: 0.8;
-    max-width: calc(var(--sheldWidth) * 0.25);
+    max-width: calc(var(--sheldWidth) * 0.2);
     flex-grow: 1;
 }
 

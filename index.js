@@ -7,6 +7,7 @@ const {
     getRequestHeaders,
     openGroupChat,
     openCharacterChat,
+    executeSlashCommands,
 } = SillyTavern.getContext();
 import { debounce } from '../../../utils.js';
 
@@ -104,6 +105,18 @@ const icons = [
         position: 'right',
         title: 'Rename chat',
         onClick: onRenameChatClick,
+    },
+    {
+        id: 'extensionTopBarDeleteChat',
+        icon: 'fa-fw fa-solid fa-trash',
+        position: 'right',
+        title: 'Delete chat',
+        onClick: async () => {
+            const confirm = await callGenericPopup('<h3>Are you sure?</h3>', 2);
+            if (confirm) {
+                await executeSlashCommands('/delchat');
+            }
+        },
     },
     {
         id: 'extensionTopBarCloseChat',
