@@ -309,7 +309,7 @@ patchSheldIfNeeded();
 addTopBar();
 addIcons();
 setChatName(getCurrentChatId());
-chatName.addEventListener('change', () => {
+chatName.addEventListener('change', async () => {
     const context = SillyTavern.getContext();
     const chatId = chatName.value;
 
@@ -318,12 +318,12 @@ chatName.addEventListener('change', () => {
     }
 
     if (typeof openGroupChat === 'function' && context.groupId) {
-        openGroupChat(context.groupId, chatId);
+        await openGroupChat(context.groupId, chatId);
         return;
     }
 
     if (typeof openCharacterChat === 'function' && context.characterId !== undefined) {
-        openCharacterChat(chatId);
+        await openCharacterChat(chatId);
         return;
     }
 });
