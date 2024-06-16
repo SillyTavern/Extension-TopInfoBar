@@ -280,6 +280,7 @@ function addIcons() {
         iconElement.id = icon.id;
         iconElement.className = icon.icon;
         iconElement.title = icon.title;
+        iconElement.tabIndex = 0;
         iconElement.classList.add('right_menu_button');
         iconElement.addEventListener('click', () => {
             if (iconElement.classList.contains('disabled')) {
