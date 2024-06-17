@@ -28,6 +28,10 @@ body #sheld.flexPatch #chat {
     font-size: calc(var(--mainFontSize) * 0.9);
 }
 
+#extensionTopBar .not-in-chat {
+    opacity: 0.5;
+}
+
 #extensionTopBarChatName {
     flex: 1;
     cursor: pointer;

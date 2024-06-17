@@ -182,7 +182,7 @@ function setChatName(name) {
     icons.forEach(icon => {
         const iconElement = document.getElementById(icon.id);
         if (iconElement) {
-            iconElement.classList.toggle('disabled', isNotInChat);
+            iconElement.classList.toggle('not-in-chat', isNotInChat);
         }
     });
 
@@ -283,7 +283,7 @@ function addIcons() {
         iconElement.tabIndex = 0;
         iconElement.classList.add('right_menu_button');
         iconElement.addEventListener('click', () => {
-            if (iconElement.classList.contains('disabled')) {
+            if (iconElement.classList.contains('not-in-chat')) {
                 return;
             }
             icon.onClick();
