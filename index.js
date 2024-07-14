@@ -215,8 +215,9 @@ function setChatName(name) {
                     option.value = x;
                     option.selected = x === name;
 
-                    const position = index < selectedIndex ? 'beforebegin' : 'afterend';
-                    selectedOption.insertAdjacentElement(position, option);
+                    index < selectedIndex
+                        ? selectedOption.insertAdjacentElement('beforebegin', option)
+                        : chatName.appendChild(option);
                 });
             }
         }, 0);
