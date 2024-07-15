@@ -202,23 +202,16 @@ function setChatName(name) {
             }
 
             if (list.length > 0) {
-                const selectedIndex = list.indexOf(name);
-                chatName.disabled = false;
-                list.sort((a, b) => a.localeCompare(b));
-                list.forEach((x, index) => {
-                    if (index === selectedIndex) {
-                        return;
-                    }
-
+                chatName.innerHTML = '';
+                list.sort((a, b) => a.localeCompare(b)).forEach((x) => {
                     const option = document.createElement('option');
                     option.innerText = x;
                     option.value = x;
                     option.selected = x === name;
 
-                    index < selectedIndex
-                        ? selectedOption.insertAdjacentElement('beforebegin', option)
-                        : chatName.appendChild(option);
+                    chatName.appendChild(option);
                 });
+                chatName.disabled = false;
             }
         }, 0);
     }
