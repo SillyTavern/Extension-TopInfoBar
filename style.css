@@ -8,11 +8,13 @@ body #sheld.flexPatch #chat {
 }
 
 #extensionTopBarToggleConnectionProfiles.active,
+#extensionTopBarTogglePresetProfiles.active,
 #extensionTopBarToggleSidebar.active {
     filter: brightness(150%);
 }
 
-#extensionConnectionProfiles {
+#extensionConnectionProfiles,
+#extensionPresetProfiles {
     display: none;
     flex-direction: row;
     flex-wrap: wrap;
@@ -37,7 +39,8 @@ body #sheld.flexPatch #chat {
 }
 
 #extensionSideBar.visible,
-#extensionConnectionProfiles.visible {
+#extensionConnectionProfiles.visible,
+#extensionPresetProfiles.visible {
     display: flex;
 }
 
@@ -185,7 +188,8 @@ body.movingUI #extensionTopBar {
     opacity: 0.5;
 }
 
-#extensionConnectionProfilesSelect {
+#extensionConnectionProfilesSelect,
+#extensionPresetProfilesSelect {
     flex: 1;
     cursor: pointer;
     overflow-x: hidden;
@@ -239,4 +243,8 @@ body.movingUI #extensionTopBar {
     font-style: italic;
     opacity: 0.5;
     border-color: transparent;
+}
+
+#extensionConnectionProfiles.visible:has(~ #extensionPresetProfiles.visible) {
+    border-radius: 0;
 }

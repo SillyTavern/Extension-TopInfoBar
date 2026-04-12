@@ -29,6 +29,9 @@ const connectionProfiles = document.createElement('div');
 const connectionProfilesStatus = document.createElement('div');
 const connectionProfilesSelect = document.createElement('select');
 const connectionProfilesIcon = document.createElement('img');
+const presetProfiles = document.createElement('div');
+const presetProfilesStatus = document.createElement('div');
+const presetProfilesSelect = document.createElement('select');
 
 const icons = [
     {
@@ -45,6 +48,14 @@ const icons = [
         title: t`Show connection profiles`,
         isTemporaryAllowed: true,
         onClick: onToggleConnectionProfilesClick,
+    },
+    {
+        id: 'extensionTopBarTogglePresetProfiles',
+        icon: 'fa-fw fa-solid fa-sliders',
+        position: 'left',
+        title: t`Show chat completion preset`,
+        isTemporaryAllowed: true,
+        onClick: onTogglePresetProfilesClick,
     },
     {
         id: 'extensionTopBarChatManager',
@@ -345,6 +356,24 @@ function addConnectionProfiles() {
     });
 }
 
+function addPresetProfiles() {
+    presetProfiles.id = 'extensionPresetProfiles';
+    presetProfilesStatus.id = 'extensionPresetProfilesStatus';
+    presetProfilesSelect.id = 'extensionPresetProfilesSelect';
+    presetProfilesSelect.title = t`Switch chat completion preset`;
+
+    const presetProfilesIcon = document.createElement('i');
+    presetProfilesIcon.id = 'extensionPresetProfilesIcon';
+    presetProfilesIcon.className = 'fa-fw fa-solid fa-sliders';
+
+    presetProfiles.append(presetProfilesIcon, presetProfilesSelect);
+    sheld.insertBefore(presetProfiles, chat);
+
+    apiBlock.querySelectorAll('select').forEach(select => {
+        select.addEventListener('input', () => updateStatusDebounced());
+    });
+}
+
 function bindConnectionProfilesSelect() {
     waitUntilCondition(() => document.getElementById('connection_profiles') !== null).then(() => {
         const connectionProfilesMainSelect = /** @type {HTMLSelectElement} */ (document.getElementById('connection_profiles'));
@@ -354,15 +383,45 @@ function bindConnectionProfilesSelect() {
         connectionProfilesSelect.addEventListener('change', async () => {
             connectionProfilesMainSelect.value = connectionProfilesSelect.value;
             connectionProfilesMainSelect.dispatchEvent(new Event('change'));
+            setTimeout(() => {
+                const presetProfilesMainSelect = /** @type {HTMLSelectElement} */ (document.getElementById('settings_preset_openai'));
+                if (presetProfilesMainSelect) presetProfilesSelect.value = presetProfilesMainSelect.value;
+            }, 150);
         });
         connectionProfilesMainSelect.addEventListener('change', async () => {
             connectionProfilesSelect.value = connectionProfilesMainSelect.value;
+            setTimeout(() => {
+                const presetProfilesMainSelect = /** @type {HTMLSelectElement} */ (document.getElementById('settings_preset_openai'));
+                if (presetProfilesMainSelect) presetProfilesSelect.value = presetProfilesMainSelect.value;
+            }, 150);
         });
         const observer = new MutationObserver(() => {
             connectionProfilesSelect.innerHTML = connectionProfilesMainSelect.innerHTML;
             connectionProfilesSelect.value = connectionProfilesMainSelect.value;
         });
         observer.observe(connectionProfilesMainSelect, { childList: true });
+    });
+}
+
+function bindPresetProfilesSelect() {
+    waitUntilCondition(() => document.getElementById('settings_preset_openai') !== null).then(() => {
+        const presetProfilesMainSelect = /** @type {HTMLSelectElement} */ (document.getElementById('settings_preset_openai'));
+        if (!presetProfilesMainSelect) {
+            console.warn("Preset select not found!");
+            return;
+        }
+        presetProfilesSelect.addEventListener('change', async () => {
+            presetProfilesMainSelect.value = presetProfilesSelect.value;
+            presetProfilesMainSelect.dispatchEvent(new Event('change'));
+        });
+        presetProfilesMainSelect.addEventListener('change', async () => {
+            presetProfilesSelect.value = presetProfilesMainSelect.value;
+        });
+        const observer = new MutationObserver(() => {
+            presetProfilesSelect.innerHTML = presetProfilesMainSelect.innerHTML;
+            presetProfilesSelect.value = presetProfilesMainSelect.value;
+        });
+        observer.observe(presetProfilesMainSelect, { childList: true });
     });
 }
 
@@ -548,6 +607,19 @@ async function onToggleConnectionProfilesClick() {
     await onOnlineStatusChange();
 }
 
+async function onTogglePresetProfilesClick() {
+    const button = document.getElementById('extensionTopBarTogglePresetProfiles');
+
+    if (!button) {
+        console.warn('Preset toggle button not found');
+        return;
+    }
+
+    button.classList.toggle('active');
+    presetProfiles.classList.toggle('visible');
+    savePanelsState();
+}
+
 async function onOnlineStatusChange() {
     if (!connectionProfiles.classList.contains('visible')) {
         return;
@@ -563,6 +635,12 @@ async function onOnlineStatusChange() {
 
     if (connectionProfilesStatus.nextElementSibling?.classList?.contains('icon-svg')) {
         connectionProfilesStatus.nextElementSibling.remove();
+    }
+
+    const presetProfilesMainSelect = /** @type {HTMLSelectElement} */ (document.getElementById('settings_preset_openai'));
+    if (presetProfilesMainSelect) {
+        presetProfilesSelect.innerHTML = presetProfilesMainSelect.innerHTML;
+        presetProfilesSelect.value = presetProfilesMainSelect.value;
     }
 
     const { SlashCommandParser, onlineStatus, mainApi } = SillyTavern.getContext();
@@ -644,6 +722,7 @@ function savePanelsState() {
     localStorage.setItem('topBarPanelsState', JSON.stringify({
         sidebarVisible: document.getElementById('extensionSideBar')?.classList.contains('visible'),
         connectionProfilesVisible: document.getElementById('extensionConnectionProfiles')?.classList.contains('visible'),
+        presetProfilesVisible: document.getElementById('extensionPresetProfiles')?.classList.contains('visible'),
     }));
 }
 
@@ -661,6 +740,10 @@ function restorePanelsState() {
     if (state.connectionProfilesVisible) {
         document.getElementById('extensionTopBarToggleConnectionProfiles')?.click();
     }
+
+    if (state.presetProfilesVisible) {
+        document.getElementById('extensionTopBarTogglePresetProfiles')?.click();
+    }
 }
 
 // Init extension on load
@@ -671,6 +754,7 @@ function restorePanelsState() {
     addIcons();
     addSideBar();
     addConnectionProfiles();
+    addPresetProfiles();
     setChatName(getCurrentChatId());
     chatName.addEventListener('change', onChatNameChange);
     const setChatNameDebounced = debounce(() => setChatName(getCurrentChatId()), debounce_timeout.short);
@@ -679,6 +763,7 @@ function restorePanelsState() {
     }
     eventSource.once(event_types.APP_READY, () => {
         bindConnectionProfilesSelect();
+        bindPresetProfilesSelect();
         restorePanelsState();
     });
     eventSource.on(event_types.ONLINE_STATUS_CHANGED, updateStatusDebounced);
